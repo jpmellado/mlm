@@ -4,15 +4,6 @@ from surface import *
 from entrainment import *
 import globals as gs
 
-# Define the surface parametrization you want to use
-# gs.sflux_s = Fs_diurnal
-# gs.sflux_q = Fq_diurnal
-gs.sflux_s = Fs_diurnal
-gs.sflux_q = Fq_diurnal
-
-# Define the entrainment parametrization you want to use
-gs.E = E_free_convection
-
 
 # Define of ordinary differential equations
 def dh_dt(t, state):
@@ -33,11 +24,6 @@ def dq_dt(t, state):
     q = state[2]
     dq = (gs.E(t, state) * (q_env(h) - q) + gs.sflux_q(t, state)) / h
     return dq
-
-
-# Define tendency array
-def tendency(t, state):
-    return np.array([dh_dt(t, state), ds_dt(t, state), dq_dt(t, state)])
 
 
 # To test this module
