@@ -1,0 +1,1 @@
+# Space for global variables
