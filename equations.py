@@ -7,21 +7,21 @@ import globals as gs
 
 # Define of ordinary differential equations
 def dh_dt(t, state):
-    h = state[0]
+    h = state[gs.idx_h]
     dh = gs.E(t, state) + w_env(h)
     return dh
 
 
 def ds_dt(t, state):
-    h = state[0]
-    s = state[1]
+    h = state[gs.idx_h]
+    s = state[gs.idx_s]
     ds = (gs.E(t, state) * (s_env(h) - s) + gs.sflux_s(t, state)) / h
     return ds
 
 
 def dq_dt(t, state):
-    h = state[0]
-    q = state[2]
+    h = state[gs.idx_h]
+    q = state[gs.idx_q]
     dq = (gs.E(t, state) * (q_env(h) - q) + gs.sflux_q(t, state)) / h
     return dq
 

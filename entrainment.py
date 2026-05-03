@@ -18,9 +18,9 @@ def buoyancy(T, qv):  # linearized form
 # A model for free convection conditions where the surface buoyancy flux is given
 def E_free_convection(t, state):
     A = 0.2  # entrainment coefficient
-    h = state[0]
-    s = state[1]
-    q = state[2]
+    h = state[gs.idx_h]  # define pointers for readability below
+    s = state[gs.idx_s]
+    q = state[gs.idx_q]
     # g*z will cancel out in b_plus-b so I do not need to remove it from s
     b_plus = buoyancy(s_env(h) / cpd, q_env(h))
     b = buoyancy(s / cpd, q)

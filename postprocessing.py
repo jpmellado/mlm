@@ -1,7 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import globals as gs
 from environment import *
 
+plt.rcParams['axes.spines.top'] = False
+plt.rcParams['axes.spines.right'] = False
 
 def PlotEvolution(times, states, var_names, filename):
     num_vars = len(var_names)
@@ -9,17 +12,13 @@ def PlotEvolution(times, states, var_names, filename):
     fig, axs = plt.subplots(1, num_vars, figsize=(num_vars * 3.5, 3))
 
     for iv in range(num_vars):
-        axs[iv].plot(times[:] / 3600.0, states[iv, :] / 1000.0)
+        axs[iv].plot(times[:] / 3600.0, states[iv, :])
         axs[iv].set_ylabel(var_names[iv])
 
         axs[iv].set_xlabel("elapsed time (hours)")
         axs[iv].set_xlim([0, None])
-        axs[iv].spines["right"].set_visible(False)
         axs[iv].spines["left"].set_position(("axes", -0.01))
-        axs[iv].get_yaxis().tick_left()
-        axs[iv].spines["top"].set_visible(False)
         axs[iv].spines["bottom"].set_position(("axes", -0.01))
-        axs[iv].get_xaxis().tick_bottom()
 
     plt.tight_layout(pad=0.1)
     plt.savefig(filename + ".pdf", bbox_inches="tight")
@@ -30,10 +29,9 @@ def PlotEvolution(times, states, var_names, filename):
 
 
 def PlotProfiles(times, states, var_names, filename):
-    print("Warning: PlotProfiles still needs to be generalized for arbitrary system.")
-    h = states[0, :]  # define pointers for readability below
-    s = states[1, :]
-    q = states[2, :]
+    h = states[gs.idx_h, :]  # define pointers for readability below
+    s = states[gs.idx_s, :]
+    q = states[gs.idx_q, :]
 
     num_vars = len(var_names)
 
@@ -50,29 +48,26 @@ def PlotProfiles(times, states, var_names, filename):
         )  # create grid of points for the profiles
 
         id = 0
-        iv = id + 1
-        axs[id].plot(s_env(z) / 1000.0, z / 1000.0, "--", color="black")
-        profile = np.array([states[iv, it], states[iv, it], s_env(h[it]), s_env(hmax)])
-        axs[id].plot(profile / 1000.0, z_bl / 1000.0, label="time {}".format(times[it]))
-        axs[id].set_xlabel(var_names[iv])
+        for iv in range(num_vars):
+            if iv == gs.idx_h:
+                continue
+            if iv == gs.idx_q:
+                axs[id].plot(q_env(z), z, "--", color="black")
+                profile = np.array([states[iv, it], states[iv, it], q_env(h[it]), q_env(hmax)])
+            if iv == gs.idx_s:
+                axs[id].plot(s_env(z), z, "--", color="black")
+                profile = np.array([states[iv, it], states[iv, it], s_env(h[it]), s_env(hmax)])
+            axs[id].plot(profile, z_bl, label="time {} h".format(times[it] / 3600.0))
+            axs[id].set_xlabel(var_names[iv])
+            id = id + 1
 
-        id = 1
-        iv = id + 1
-        axs[id].plot(q_env(z) / 1000.0, z / 1000.0, "--", color="black")
-        profile = np.array([states[iv, it], states[iv, it], q_env(h[it]), q_env(hmax)])
-        axs[id].plot(profile / 1000.0, z_bl / 1000.0, label="time {} h".format(times[it] / 3600.0))
-        axs[id].set_xlabel(var_names[iv])
-        axs[id].legend(loc="best")
+        axs[-1].legend(loc="best")
 
     for id in range(num_vars - 1):
-        axs[id].set_ylabel("height (km)")
+        axs[id].set_ylabel(var_names[gs.idx_h])
         axs[id].set_ylim([0, None])
-        axs[id].spines["right"].set_visible(False)
         axs[id].spines["left"].set_position(("axes", -0.01))
-        axs[id].get_yaxis().tick_left()
-        axs[id].spines["top"].set_visible(False)
         axs[id].spines["bottom"].set_position(("axes", -0.01))
-        axs[id].get_xaxis().tick_bottom()
 
     plt.tight_layout(pad=0.1)
     plt.savefig(filename + ".pdf", bbox_inches="tight")

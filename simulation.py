@@ -13,9 +13,9 @@ tinterval = 60.0 * 10.0  # every 10 minutes
 
 # define system of equations as dictionary of dictionaries
 system = {}
-system["h"] = {"ode": dh_dt, "name": "h", "name_plot": "height (km)"}
-system["s"] = {"ode": ds_dt, "name": "s", "name_plot": "liquid-water static energy (kJ/kg)"}
-system["q"] = {"ode": dq_dt, "name": "q", "name_plot": "total-water specific humidity (g/kg)"}
+system["h"] = {"ode": dh_dt, "name": "h", "name_long": "height (m)"}
+system["s"] = {"ode": ds_dt, "name": "s", "name_long": "liquid-water static energy (J/kg)"}
+system["q"] = {"ode": dq_dt, "name": "q", "name_long": "total-water specific humidity (kg/kg)"}
 num_vars = len(system)
 
 h_initial = 300.0  # m, boundary-layer height
@@ -54,6 +54,15 @@ def tendency(t, state):
     return np.array(tendency)
 
 
+# construct indexes for clarity in equations
+for idx, item in enumerate(system.values()):
+    if item["name"] == "h":
+        gs.idx_h = idx
+    if item["name"] == "s":
+        gs.idx_s = idx
+    if item["name"] == "q":
+        gs.idx_q = idx
+
 # do simulation
 sol = solve_ivp(tendency, [times[0], times[-1]], state, RK23, t_eval=times)
 print(sol.message)
@@ -68,7 +77,7 @@ save_netcdf(sol.t, sol.y, var_names, "mlm")
 # plot result
 var_names = []
 for item in system.values():
-    var_names.append(item["name_plot"])
+    var_names.append(item["name_long"])
 
 PlotEvolution(sol.t, sol.y, var_names, "evolution")
 
