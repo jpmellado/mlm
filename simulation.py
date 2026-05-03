@@ -11,11 +11,11 @@ tfinal = 3600.0 * 24.0 * 3.0  # 3 days
 # define time interval to obtain data, in seconds
 tinterval = 60.0 * 10.0  # every 10 minutes
 
-# define system of equations as dictionary of dictionaries, for clarity and flexibility
+# define system of equations as dictionary of dictionaries
 system = {}
-system["h"] = {"ode": dh_dt, "name_short": "h", "name_long": "height (km)"}
-system["s"] = {"ode": ds_dt, "name_short": "s", "name_long": "liquid-water static energy (kJ/kg)"}
-system["q"] = {"ode": dq_dt, "name_short": "q", "name_long": "total-water specific humidity (g/kg)"}
+system["h"] = {"ode": dh_dt, "name": "h", "name_plot": "height (km)"}
+system["s"] = {"ode": ds_dt, "name": "s", "name_plot": "liquid-water static energy (kJ/kg)"}
+system["q"] = {"ode": dq_dt, "name": "q", "name_plot": "total-water specific humidity (g/kg)"}
 num_vars = len(system)
 
 h_initial = 300.0  # m, boundary-layer height
@@ -61,14 +61,14 @@ print(sol.message)
 # save data
 var_names = []
 for item in system.values():
-    var_names.append(item["name_short"])
+    var_names.append(item["name"])
 
 save_netcdf(sol.t, sol.y, var_names, "mlm")
 
 # plot result
 var_names = []
 for item in system.values():
-    var_names.append(item["name_long"])
+    var_names.append(item["name_plot"])
 
 PlotEvolution(sol.t, sol.y, var_names, "evolution")
 
