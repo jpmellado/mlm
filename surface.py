@@ -1,4 +1,4 @@
-# List of possible surface parametrizations
+# List of available surface parametrizations
 import numpy as np
 from parameters import *
 

@@ -1,18 +1,10 @@
-# List of possible entrainment parametrizations
+# List of available entrainment parametrizations
 import numpy as np
 from parameters import *
 from environment import *
+from globals import buoyancy, flux_b
 import globals as gs
 from sys import exit
-
-
-def sflux_b(t, state):
-    return g * gs.sflux_s(t, state) / (cpd * T_00) + g * eps2 * gs.sflux_q(t, state)
-
-
-def buoyancy(T, qv):  # linearized form
-    b = g * (T - T_00) / T_00 + g * eps2 * (qv - q_00)
-    return b
 
 
 # A model for free convection conditions where the surface buoyancy flux is given
@@ -24,7 +16,11 @@ def E_free_convection(t, state):
     # g*z will cancel out in b_plus-b so I do not need to remove it from s
     b_plus = buoyancy(s_env(h) / cpd, q_env(h))
     b = buoyancy(s / cpd, q)
-    E = A * sflux_b(t, state) / (b_plus - b)
+
+    # free convection; source of turbulence is surface buoyancy flux
+    F_tur = flux_b(gs.sflux_s(t, state), gs.sflux_q(t, state))
+
+    E = A * F_tur / (b_plus - b)
     if E < 0:
         print("Negative entrainment rate; check conditions.")
         exit()
