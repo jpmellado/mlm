@@ -75,7 +75,7 @@ def simulation():
             gs.idx_q = idx
 
     # do simulation
-    sol = solve_ivp(tendency, [times[0], times[-1]], state, RK23, t_eval=times)
+    sol = solve_ivp(tendency, [times[0], times[-1]], state, RK23, t_eval=times, max_step=5.0*60.)
     print(sol.message)
 
     # save data
