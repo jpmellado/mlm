@@ -5,7 +5,12 @@ import globals as gs
 from iodata import *
 from postprocessing import *
 
+#####################################
+# define the problem
+
 # define total time interval to integrate, in seconds
+# time is measured as elapsed time since sunrise (see surface energy flux)
+tinitial = 0.0
 tfinal = 3600.0 * 24.0 * 3.0  # 3 days
 
 # define time interval to obtain data, in seconds
@@ -18,24 +23,26 @@ system["s"] = {"ode": ds_dt, "name": "s", "name_long": "liquid-water static ener
 system["q"] = {"ode": dq_dt, "name": "q", "name_long": "total-water specific humidity (kg/kg)"}
 num_vars = len(system)
 
-h_initial = 300.0  # m, boundary-layer height
-system["h"]["ics"] = h_initial  # m, boundary-layer height
-system["s"]["ics"] = s_env(h_initial * 0.5)  # J /kg, liquid-water static energy
-system["q"]["ics"] = q_env(h_initial * 0.5)  # total-water specific humidity
-
 # define the surface parametrization you want to use
-# gs.sflux_s = Fs_diurnal
-# gs.sflux_q = Fq_diurnal
 gs.sflux_s = Fs_diurnal
 gs.sflux_q = Fq_diurnal
 
 # define the entrainment parametrization you want to use
 gs.E = E_free_convection
 
+#####################################
+# define initial condition
+h_initial = 300.0  # m, boundary-layer height
+system["h"]["ics"] = h_initial  # m, boundary-layer height
+
+# as an example, we simply define the initial bulk values as the mean of the environment over h
+system["s"]["ics"] = s_env(h_initial * 0.5)  # J /kg, liquid-water static energy
+system["q"]["ics"] = q_env(h_initial * 0.5)  # total-water specific humidity
+
 
 ##################################### No need to change beyond this point
 # create array with the checkpointing times (times at which I get data)
-times = np.arange(0.0, tfinal, tinterval)
+times = np.arange(tinitial, tfinal, tinterval)
 times = np.append(times, tfinal)  # include the final time
 
 
@@ -73,6 +80,9 @@ for item in system.values():
     var_names.append(item["name"])
 
 save_netcdf(sol.t, sol.y, var_names, "mlm")
+
+#####################################
+# postprocessing
 
 # plot result
 var_names = []
