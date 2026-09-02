@@ -95,8 +95,10 @@ def postprocessing(t, state):
 
     PlotEvolution(t, state, var_names, "evolution")
 
-    # PlotProfiles(sol.t[-1:], sol.y[:,-1:], var_names, "profiles") # just the last
-    time_indices = [int(np.size(t) / 2), -1]  # one in the middle, and the last
+    # time_indices = []
+    # time_indices = [int(np.size(t) / 2)]  # one in the middle
+    time_indices = list(range(0,np.size(t),int(np.size(t)/5)))  # plot 5 profiles in the given range of times
+    time_indices.append(-1) # add always the last time
     PlotProfiles(
         t[time_indices],
         state[:, time_indices],
